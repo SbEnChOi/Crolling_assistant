@@ -1,0 +1,13 @@
+praw==7.7.1
+#pandas==2.1.4
+pandas==2.3.0
+python-dotenv==1.0.0
+konlpy==0.6.0
+deep-translator==1.11.4
+nltk==3.8.1
+snscrape==0.7.0.20230622
+google-api-python-client==2.108.0
+google-auth==2.25.2
+google-auth-oauthlib==1.2.0
+google-auth-httplib2==0.2.0
+openpyxl==3.1.2
