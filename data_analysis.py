@@ -61,7 +61,7 @@ class YouTubeAnalyzer:
         """기본 통계 정보 출력"""
         stats = self.get_summary_statistics()
         print("\n" + "="*50)
-        print("📊 기본 통계")
+        print("기본 통계")
         print("="*50)
         for key, value in stats.items():
             print(f"{key:.<30} {value}")
@@ -417,7 +417,7 @@ class YouTubeAnalyzer:
         
         for filename, fig in charts.items():
             filepath = os.path.join(output_dir, filename)
-            fig.savefig(filepath, dpi=300, bbox_inches='tight', encoding='utf-8')
+            fig.savefig(filepath, dpi=300, bbox_inches='tight')
             print(f"✓ {filename} 저장")
             plt.close(fig)
         
@@ -619,7 +619,7 @@ class YouTubeAnalyzer:
         </div>
         
         <div class="link-section">
-            <a href="interactive_dashboard.html" target="_blank">🎯 인터랙티브 대시보드 보기</a>
+            <a href="interactive_dashboard.html" target="_blank"> 인터랙티브 대시보드 보기</a>
         </div>
         
         <footer>

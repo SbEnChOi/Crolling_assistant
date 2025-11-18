@@ -94,3 +94,14 @@ python main.py
 - 번역 서비스는 인터넷 연결이 필요합니다
 - KoNLPy는 Java가 설치되어 있어야 정상 작동합니다
 
+
+
+# 2025/11/16 
+snscrape 로 twiiter 를 크롤링하는 것을 불가능해짐. 
+즉 twitter 는 api 로 하는 것이 맞음
+
+그 다음 reddit 은 reddit api 를 요청했지만 4일쨰 아무 소식이 없음 
+snscrape 로 시도했지만 오류, 아마도 버전문제 또는 reddit 도 안되는 것일수도 있음
+
+그럼 지금 할 수 있는 것은 남은 naver,youtube 를 크롤링하는 것.
+

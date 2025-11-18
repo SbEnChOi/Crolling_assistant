@@ -1,7 +1,7 @@
 # 환경 변수 파일
 .env
 key.env
-
+analysis_report
 # API 인증 정보
 client_secret.json
 youtube_token.pickle
