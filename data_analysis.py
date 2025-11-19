@@ -14,12 +14,14 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 import warnings
 import os
+from matplotlib import font_manager, rc # 폰트 세팅을 위한 모듈 추가
 warnings.filterwarnings('ignore')
 
 # 한글 폰트 설정
-plt.rcParams['font.family'] = 'DejaVu Sans'
+#plt.rcParams['font.family'] = 'DejaVu Sans'
 sns.set_style("whitegrid")
 sns.set_palette("husl")
+plt.rcParams['font.family'] = 'Malgun Gothic'
 
 
 class YouTubeAnalyzer:
@@ -394,7 +396,7 @@ class YouTubeAnalyzer:
         os.makedirs(output_dir, exist_ok=True)
         
         print("\n" + "="*50)
-        print("📊 분석 리포트 생성 중...")
+        print(" 분석 리포트 생성 중...")
         print("="*50)
         
         # 기본 통계 출력
@@ -428,7 +430,7 @@ class YouTubeAnalyzer:
         self._generate_html_report(output_dir)
         
         print("\n" + "="*50)
-        print(f"✓ 분석 리포트 생성 완료: {output_dir}")
+        print(f"분석 리포트 생성 완료: {output_dir}")
         print("="*50)
     
     def _generate_html_report(self, output_dir):
@@ -531,7 +533,7 @@ class YouTubeAnalyzer:
 </head>
 <body>
     <div class="container">
-        <h1>📊 YouTube 데이터 분석 리포트</h1>
+        <h1>YouTube 데이터 분석 리포트</h1>
         
         <h2>기본 통계</h2>
         <div class="stats-grid">
@@ -634,7 +636,7 @@ class YouTubeAnalyzer:
         report_path = os.path.join(output_dir, 'report.html')
         with open(report_path, 'w', encoding='utf-8') as f:
             f.write(html_content)
-        print(f"✓ HTML 리포트 저장: report.html")
+        print(f"HTML 리포트 저장: report.html")
 
 
 class CommentAnalyzer:
@@ -663,7 +665,7 @@ class CommentAnalyzer:
         """댓글 통계 출력"""
         stats = self.get_summary_statistics()
         print("\n" + "="*50)
-        print("💬 댓글 분석 통계")
+        print(" 댓글 분석 통계")
         print("="*50)
         for key, value in stats.items():
             print(f"{key:.<30} {value}")

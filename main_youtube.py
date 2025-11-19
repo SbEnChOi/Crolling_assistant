@@ -14,6 +14,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import pandas as pd
 from keyword_extractor import extract_and_translate_keywords
+from data_analysis import analyze_youtube_data
 
 # 환경변수 로드
 # key.env 파일을 명시적으로 로드
@@ -88,13 +89,9 @@ def get_user_input():
             raise ValueError("동영상 개수는 숫자로 입력해주세요.")
         raise
     
-    # 인증 방식 선택
-    print("\n인증 방식을 선택하세요:")
-    print("1. OAuth 2.0 (권장, 더 높은 할당량, 추가 기능)")
-    print("2. API 키 (간단, 제한된 할당량)")
-    
-    auth_choice = input("선택 (1-2, 기본값: 1): ").strip()
-    use_oauth = auth_choice != '2'
+    # 인증 방식 고정: OAuth 2.0 사용 (사용자에게 묻지 않음)
+    #print("\n인증 방식: OAuth 2.0으로 고정")
+    use_oauth = True
     
     # 댓글 수집 여부
     collect_comments = input("댓글도 수집하시겠습니까? (y/n, 기본값: n): ").strip().lower()
@@ -484,7 +481,13 @@ def save_to_csv(videos_data, comments_data, keywords, start_date, end_date, coll
     try:
         if not videos_data:
             print("저장할 데이터가 없습니다.")
-            return None, None, None, None
+            return None, None, None, None, None
+        
+        # 출력 폴더 생성 (타임스탬프 포함)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_folder = f"crawl_output_{timestamp}"
+        os.makedirs(output_folder, exist_ok=True)
+        print(f"\n출력 폴더 생성: {output_folder}")
         
         # 파일명 생성
         first_keyword = keywords[0] if keywords else "search"
@@ -496,18 +499,19 @@ def save_to_csv(videos_data, comments_data, keywords, start_date, end_date, coll
         df_videos = pd.DataFrame(videos_data)
         
         # CSV 파일 저장
-        videos_csv_filename = f"youtube_videos_{sanitized_keyword}_{start_date_str}_{end_date_str}.csv"
+        videos_csv_filename = os.path.join(output_folder, f"youtube_videos_{sanitized_keyword}_{start_date_str}_{end_date_str}.csv")
         df_videos.to_csv(videos_csv_filename, index=False, encoding='utf-8-sig')
-        print(f"\n동영상 CSV 파일이 저장되었습니다: {videos_csv_filename}")
-        print(f"총 {len(df_videos)}개의 동영상 데이터가 저장되었습니다.")
+        print(f" 동영상 CSV 파일: {videos_csv_filename}")
+        print(f"  총 {len(df_videos)}개의 동영상 데이터가 저장되었습니다.")
         
         # Excel 파일 저장
-        videos_excel_filename = f"youtube_videos_{sanitized_keyword}_{start_date_str}_{end_date_str}.xlsx"
+        videos_excel_filename = os.path.join(output_folder, f"youtube_videos_{sanitized_keyword}_{start_date_str}_{end_date_str}.xlsx")
         try:
             df_videos.to_excel(videos_excel_filename, index=False, engine='openpyxl')
-            print(f"동영상 Excel 파일이 저장되었습니다: {videos_excel_filename}")
+            print(f"동영상 Excel 파일: {videos_excel_filename}")
         except ImportError:
             print("Excel 저장을 위해 openpyxl이 필요합니다: pip install openpyxl")
+            videos_excel_filename = None
         except Exception as e:
             print(f"Excel 파일 저장 실패: {str(e)}")
             videos_excel_filename = None
@@ -519,23 +523,23 @@ def save_to_csv(videos_data, comments_data, keywords, start_date, end_date, coll
             df_comments = pd.DataFrame(comments_data)
             
             # CSV 파일 저장
-            comments_csv_filename = f"youtube_comments_{sanitized_keyword}_{start_date_str}_{end_date_str}.csv"
+            comments_csv_filename = os.path.join(output_folder, f"youtube_comments_{sanitized_keyword}_{start_date_str}_{end_date_str}.csv")
             df_comments.to_csv(comments_csv_filename, index=False, encoding='utf-8-sig')
-            print(f"댓글 CSV 파일이 저장되었습니다: {comments_csv_filename}")
-            print(f"총 {len(df_comments)}개의 댓글 데이터가 저장되었습니다.")
+            print(f"✓ 댓글 CSV 파일: {comments_csv_filename}")
+            print(f"  총 {len(df_comments)}개의 댓글 데이터가 저장되었습니다.")
             
             # Excel 파일 저장
-            comments_excel_filename = f"youtube_comments_{sanitized_keyword}_{start_date_str}_{end_date_str}.xlsx"
+            comments_excel_filename = os.path.join(output_folder, f"youtube_comments_{sanitized_keyword}_{start_date_str}_{end_date_str}.xlsx")
             try:
                 df_comments.to_excel(comments_excel_filename, index=False, engine='openpyxl')
-                print(f"댓글 Excel 파일이 저장되었습니다: {comments_excel_filename}")
+                print(f"✓ 댓글 Excel 파일: {comments_excel_filename}")
             except ImportError:
                 print("Excel 저장을 위해 openpyxl이 필요합니다: pip install openpyxl")
             except Exception as e:
                 print(f"댓글 Excel 파일 저장 실패: {str(e)}")
                 comments_excel_filename = None
         
-        return videos_csv_filename, videos_excel_filename, comments_csv_filename, comments_excel_filename
+        return videos_csv_filename, videos_excel_filename, comments_csv_filename, comments_excel_filename, output_folder
     
     except Exception as e:
         raise Exception(f"파일 저장에 실패했습니다: {str(e)}")
@@ -563,7 +567,7 @@ def main():
             return
         
         # CSV 및 Excel 파일로 저장
-        videos_csv_filename, videos_excel_filename, comments_csv_filename, comments_excel_filename = save_to_csv(
+        videos_csv_filename, videos_excel_filename, comments_csv_filename, comments_excel_filename, output_folder = save_to_csv(
             videos_data, comments_data, all_keywords, start_date, end_date, collect_comments)
         
         # DataFrame 생성 및 출력 옵션 설정
@@ -642,7 +646,23 @@ def main():
             print(f"댓글 CSV 파일: {comments_csv_filename}")
             if comments_excel_filename:
                 print(f"댓글 Excel 파일: {comments_excel_filename}")
-        
+        # 분석/시각화 실행 여부 묻기
+        try:
+            run_viz = input("\n수집된 데이터로 분석 및 시각화를 실행하시겠습니까? (y/n, 기본값: n): ").strip().lower()
+        except Exception:
+            run_viz = 'n'
+
+        if run_viz in ('y', 'yes'):
+            if videos_csv_filename:
+                print("\n데이터 분석 및 시각화 실행 중...")
+                try:
+                    # 분석 보고서를 같은 폴더의 analysis_report 하위에 저장
+                    analysis_output_dir = os.path.join(output_folder, 'analysis_report')
+                    analyze_youtube_data(videos_csv_filename, output_dir=analysis_output_dir)
+                except Exception as e:
+                    print(f"분석 실행 중 오류: {str(e)}")
+            else:
+                print("CSV 파일이 없어 분석을 실행할 수 없습니다.")
     except ValueError as e:
         print(f"\n입력 오류: {str(e)}")
     except ConnectionError as e:
