@@ -1,6 +1,6 @@
-# Reddit 크롤링 프로그램
+# 크롤링 도우미
 
-Reddit에서 키워드로 게시물을 크롤링하고 CSV 파일로 저장하는 프로그램입니다.
+대상 매체에서 에서 키워드로 게시물을 크롤링하고 CSV 파일로 저장하는 프로그램입니다.
 문장을 입력하면 자동으로 키워드를 추출하고 영어로 번역하여 검색합니다.
 
 ## 주요 기능
@@ -19,7 +19,7 @@ Reddit에서 키워드로 게시물을 크롤링하고 CSV 파일로 저장하�
 pip install -r requirements.txt
 ```
 
-**참고**: KoNLPy는 Java가 필요합니다. Windows에서는 [JDK 설치](https://www.oracle.com/java/technologies/downloads/)가 필요할 수 있습니다.
+**참고**: KoNLPy는 Java가 필요합니다. Windows에서는 [JDK 설치](https://www.oracle.com/java/technologies/downloads/)가 필요할 수 있음.
 
 ### 2. Reddit API 키 발급
 
