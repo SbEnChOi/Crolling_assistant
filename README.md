@@ -105,3 +105,13 @@ snscrape 로 시도했지만 오류, 아마도 버전문제 또는 reddit 도 �
 
 그럼 지금 할 수 있는 것은 남은 naver,youtube 를 크롤링하는 것.
 
+
+# 2025/11/19 
+일단 대상매체는 youtube 만 하기로 함. 
+readme를 수정할 필요가 있음
+reddit 은 정말 나쁜놈들임
+이제 남은 과제는 파이썬 3.13 환경에서 모두 굴러가야함. 
+그리고 꼭 필요한 파일 
+client_secret.json
+key.env
+youtube_token.pickle 를 성수쌤한테 보내야함. 
