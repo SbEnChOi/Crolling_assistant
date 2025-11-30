@@ -28,19 +28,54 @@ from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-
-
 import sys
 import subprocess
 import pkg_resources
 
+# git hub 링크 : https://github.com/SbEnChOi/Crolling_assistant.git
+
+
+# ---------------------------------------------------------
+# Embedded Configurations
+# ---------------------------------------------------------
+
+REQUIRED_PACKAGES = [
+    'python-dotenv==1.0.1',
+    'openpyxl==3.1.2',
+    'pandas==2.3.3',
+    'numpy==2.2.6',
+    'matplotlib==3.10.6',
+    'seaborn==0.13.2',
+    'wordcloud==1.9.4',
+    'plotly==5.23.0',
+    'konlpy==0.6.0',
+    'deep-translator==1.11.4',
+    'nltk==3.9.2',
+    'google-api-python-client==2.176.0',
+    'google-auth==2.28.0',
+    'google-auth-oauthlib==1.2.0',
+    'google-auth-httplib2==0.2.0',
+    'requests==2.32.4',
+    'beautifulsoup4==4.13.4',
+    'lxml==6.0.2'
+]
+
+CLIENT_CONFIG = {
+    "installed": {
+        "client_id": "616770459881-f5ip9jvluj0gdkm9443p04tnn6b1m0dk.apps.googleusercontent.com",
+        "project_id": "gen-lang-client-0741447260",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_secret": "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",
+        "redirect_uris": ["http://localhost"]
+    }
+}
+
 def install_requirements():
-    # requirements.txt 파일 읽기
-    with open('requirements.txt', 'r', encoding='utf-8') as f:
-        requirements = f.read().splitlines()
     # 설치가 필요한 패키지 리스트 확인
     missing_packages = []
-    for package in requirements:
+    for package in REQUIRED_PACKAGES:
         try:
             pkg_resources.require(package)
         except (pkg_resources.DistributionNotFound, pkg_resources.VersionConflict):
@@ -547,7 +582,8 @@ def authenticate_oauth():
         if credentials and credentials.expired and credentials.refresh_token:
             credentials.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
+            # flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
+            flow = InstalledAppFlow.from_client_config(CLIENT_CONFIG, SCOPES)
             credentials = flow.run_local_server(port=0)
         
         with open(TOKEN_FILE, 'wb') as token:
