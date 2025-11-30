@@ -602,20 +602,39 @@ def connect_youtube():
         return build('youtube', 'v3', developerKey=api_key)
 
 def search_videos(youtube, keyword, start_date, end_date, order='relevance', max_results=50):
+    video_ids = []
+    next_page_token = None
+    
     try:
         published_after = start_date.strftime('%Y-%m-%dT%H:%M:%SZ')
         published_before = (end_date.replace(hour=23, minute=59, second=59)).strftime('%Y-%m-%dT%H:%M:%SZ')
         
-        response = youtube.search().list(
-            q=keyword, part='id,snippet', type='video', order=order,
-            publishedAfter=published_after, publishedBefore=published_before,
-            maxResults=min(max_results, 50), relevanceLanguage='en'
-        ).execute()
-        
-        return [item['id']['videoId'] for item in response.get('items', [])]
+        while len(video_ids) < max_results:
+            remaining = max_results - len(video_ids)
+            limit = min(remaining, 50)
+            
+            response = youtube.search().list(
+                q=keyword, part='id,snippet', type='video', order=order,
+                publishedAfter=published_after, publishedBefore=published_before,
+                maxResults=limit, relevanceLanguage='en',
+                pageToken=next_page_token
+            ).execute()
+            
+            items = response.get('items', [])
+            if not items:
+                break
+                
+            for item in items:
+                video_ids.append(item['id']['videoId'])
+            
+            next_page_token = response.get('nextPageToken')
+            if not next_page_token:
+                break
+                
+        return video_ids[:max_results]
     except HttpError as e:
         print(f"검색 오류: {e}")
-        return []
+        return video_ids
 
 def get_video_details(youtube, video_ids):
     videos_data = []
@@ -691,8 +710,7 @@ def crawl_youtube(youtube, keywords, start_date, end_date, max_videos, collect_c
             continue
             
         videos = get_video_details(youtube, new_ids)
-        
-        # Filter by date and add keyword
+    
         valid_videos = []
         for v in videos:
             if v['upload_date']:
@@ -705,7 +723,7 @@ def crawl_youtube(youtube, keywords, start_date, end_date, max_videos, collect_c
         print(f"  -> {len(valid_videos)}개 수집")
         
         if collect_comments:
-            for v in valid_videos[:5]: # Limit comments collection
+            for v in valid_videos[:5]: 
                 if len(all_comments) >= max_videos * 10:
                     break
                 c = get_video_comments(youtube, v['video_id'], 20)
