@@ -28,6 +28,40 @@ from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+
+
+import sys
+import subprocess
+import pkg_resources
+
+def install_requirements():
+    # requirements.txt 파일 읽기
+    with open('requirements.txt', 'r', encoding='utf-8') as f:
+        requirements = f.read().splitlines()
+    # 설치가 필요한 패키지 리스트 확인
+    missing_packages = []
+    for package in requirements:
+        try:
+            pkg_resources.require(package)
+        except (pkg_resources.DistributionNotFound, pkg_resources.VersionConflict):
+            missing_packages.append(package)
+
+    # 누락된 패키지가 있을 경우에만 설치 실행
+    if missing_packages:
+        print(f"설치되지 않은 패키지 발견: {missing_packages}")
+        print("패키지 설치를 시작합니다...")
+        python = sys.executable
+        subprocess.check_call([python, '-m', 'pip', 'install', *missing_packages])
+        print("설치 완료!")
+    else:
+        print("모든 패키지가 이미 설치되어 있습니다.")
+
+
+#-----------------------------------------
+# 키워드 추출 부분
+#-----------------------------------------
+
+
 # NLTK 데이터 다운로드
 for resource in ['tokenizers/punkt', 'corpora/stopwords']:
     try:
@@ -687,4 +721,5 @@ def main():
         # import traceback; traceback.print_exc() # 디버깅용
 
 if __name__ == '__main__':
+    install_requirements()
     main()
