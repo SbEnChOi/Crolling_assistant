@@ -10,6 +10,44 @@ import warnings
 from datetime import datetime
 from typing import List, Tuple, Set
 
+import sys
+import subprocess
+
+# 설치가 필요한 패키지 검증
+required = {
+    "pandas": "pandas",
+    "numpy": "numpy",
+    "matplotlib": "matplotlib",
+    "seaborn": "seaborn",
+    "wordcloud": "wordcloud",
+    "plotly": "plotly",
+    "konlpy": "konlpy",
+    "deep-translator": "deep_translator",
+    "nltk": "nltk",
+    "google-api-python-client": "googleapiclient",
+    "google-auth": "google.auth",
+    "google-auth-oauthlib": "google_auth_oauthlib",
+    "google-auth-httplib2": "google.auth.transport.httplib2",
+    "requests": "requests",
+    "beautifulsoup4": "bs4",
+    "lxml": "lxml",
+    "openpyxl": "openpyxl",
+    "python-dotenv": "dotenv"
+}
+
+missing = []
+for pkg, module in required.items():
+    try:
+        __import__(module)
+    except ImportError:
+        missing.append(pkg)
+
+if missing:
+    print(f"'{','.join(missing)}' 설치 중...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", *missing])
+else:
+    print("모든 패키지가 이미 설치되어 있습니다.")
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -19,6 +57,7 @@ from matplotlib import font_manager, rc
 import plotly.graph_objects as go
 import plotly.express as px
 from dotenv import load_dotenv
+
 from konlpy.tag import Okt
 from deep_translator import GoogleTranslator
 import nltk
@@ -28,37 +67,12 @@ from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-import sys
-import subprocess
-import pkg_resources
-
 # git hub 링크 : https://github.com/SbEnChOi/Crolling_assistant.git
 
 
 # ---------------------------------------------------------
 # Embedded Configurations
 # ---------------------------------------------------------
-
-REQUIRED_PACKAGES = [
-    'python-dotenv==1.0.1',
-    'openpyxl==3.1.2',
-    'pandas==2.3.3',
-    'numpy==2.2.6',
-    'matplotlib==3.10.6',
-    'seaborn==0.13.2',
-    'wordcloud==1.9.4',
-    'plotly==5.23.0',
-    'konlpy==0.6.0',
-    'deep-translator==1.11.4',
-    'nltk==3.9.2',
-    'google-api-python-client==2.176.0',
-    'google-auth==2.28.0',
-    'google-auth-oauthlib==1.2.0',
-    'google-auth-httplib2==0.2.0',
-    'requests==2.32.4',
-    'beautifulsoup4==4.13.4',
-    'lxml==6.0.2'
-]
 
 CLIENT_CONFIG = {
     "installed": {
@@ -72,24 +86,11 @@ CLIENT_CONFIG = {
     }
 }
 
-def install_requirements():
-    # 설치가 필요한 패키지 리스트 확인
-    missing_packages = []
-    for package in REQUIRED_PACKAGES:
-        try:
-            pkg_resources.require(package)
-        except (pkg_resources.DistributionNotFound, pkg_resources.VersionConflict):
-            missing_packages.append(package)
 
-    # 누락된 패키지가 있을 경우에만 설치 실행
-    if missing_packages:
-        print(f"설치되지 않은 패키지 발견: {missing_packages}")
-        print("패키지 설치를 시작합니다...")
-        python = sys.executable
-        subprocess.check_call([python, '-m', 'pip', 'install', *missing_packages])
-        print("설치 완료!")
-    else:
-        print("모든 패키지가 이미 설치되어 있습니다.")
+
+
+
+
 
 
 #-----------------------------------------
@@ -190,15 +191,12 @@ def select_keywords(keywords: List[str]) -> List[str]:
         try:
             selection = input("\n사용할 키워드 입력 (콤마 구분, 'all' 전체): ").strip()
             if selection.lower() == 'all':
-                return keywords
-            
+                return keywords  
             if not selection:
-                continue
-            
+                continue      
             input_keywords = [kw.strip() for kw in selection.split(',') if kw.strip()]
             if not input_keywords:
-                continue
-            
+                continue 
             selected_keywords = []
             for input_kw in input_keywords:
                 for kw in keywords:
@@ -538,9 +536,9 @@ load_dotenv('.env')
 SCOPES = ['https://www.googleapis.com/auth/youtube.force-ssl']
 TOKEN_FILE = 'youtube_token.pickle'
 
-def sanitize_filename(text):
-    text = re.sub(r'[^\w\s-]', '', text)
-    return re.sub(r'[-\s]+', '_', text)
+# def sanitize_filename(text):
+#     text = re.sub(r'[^\w\s-]', '', text)
+#     return re.sub(r'[-\s]+', '_', text)
 
 def get_user_input():
     print("=" * 50 + "\nYouTube 크롤링 프로그램\n" + "=" * 50)
@@ -694,7 +692,6 @@ def crawl_youtube(youtube, keywords, start_date, end_date, max_videos, collect_c
     all_videos = []
     all_comments = []
     seen_ids = set()
-    
     print(f"\n검색 시작 ({len(keywords)}개 키워드)...")
     
     for keyword in keywords:
@@ -775,5 +772,4 @@ def main():
         # import traceback; traceback.print_exc() # 디버깅용
 
 if __name__ == '__main__':
-    install_requirements()
     main()
