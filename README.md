@@ -1,3 +1,5 @@
+<img width="2547" height="1332" alt="image" src="https://github.com/user-attachments/assets/113d5f04-19d0-444b-9281-58c01ba6672c" />
+
 # 크롤링 도우미
 
 대상 매체에서 에서 키워드로 게시물을 크롤링하고 CSV 파일로 저장하는 프로그램입니다.
